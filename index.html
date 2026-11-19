@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="glass">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>White-Label School Management</title>
+  <link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2563eb" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell hidden">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-box" id="openBrandModal" title="Click to customize School Logo & Name">
+        <img id="schoolLogoImg" alt="School Logo" />
+        <div>
+          <h2 id="schoolNameDisplay">SM Info.</h2>
+          <span class="edit-badge">✎ Edit Brand</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-item active" data-view="dashboard"><span>⊞</span> Dashboard</button>
+        <button class="nav-item" data-view="search-dir"><span>🔍</span> Student Search</button>
+        <button class="nav-item" data-view="exams-view"><span>📝</span> Exams & Report Cards</button>
+        <button class="nav-item" data-view="fees-view"><span>💳</span> Fee Management</button>
+        <button class="nav-item" data-view="permissions-view" id="navPermissionsBtn"><span>🔐</span> Permissions & Accounts</button>
+
+        <button class="nav-item" data-view="students"><span>🎓</span> Students & Vault</button>
+        <button class="nav-item" data-view="records"><span>📅</span> Past / Future Records</button>
+        <button class="nav-item" id="openUploadModal"><span>📤</span> Upload Files / CSV</button>
+        <button class="nav-item" id="sendEmailBtn"><span>✉️</span> Send Email Alerts</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" id="openBrandModalBottom"><span>⚙️</span> White-Label Settings</button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="schoolTaglineDisplay" class="subtitle">School Management Portal</p>
+        </div>
+
+        <div class="controls-bar">
+          <button id="openAdmissionBtn" class="btn-primary">+ New Admission</button>
+
+          <!-- Timeline Filter -->
+          <select id="timelineSelect" class="pill-select" aria-label="Academic Timeline">
+            <option value="present">Present (2026–27)</option>
+            <option value="past">Past Archive (2025–26)</option>
+            <option value="future">Future Admissions (2027–28)</option>
+          </select>
+
+          <!-- Authenticated Role & Login Controls -->
+          <div class="role-switcher" id="authRoleBar" style="display:inline-flex; align-items:center; gap:6px;">
+            <span id="loggedUserBadge" style="padding:4px 10px; font-size:0.82rem; font-weight:700; color:var(--accent-orange);">Guest (Preview)</span>
+            <button id="openLoginModalBtn" class="role-btn active" type="button">🔐 Login</button>
+            <button id="logoutBtn" class="role-btn hidden" type="button">Logout</button>
+          </div>
+
+
+          <!-- Theme Switcher (Glass Light vs Sleek Dark) -->
+          <button id="themeToggle" class="theme-btn" title="Switch Glassmorphism / Dark Mode">
+            <span id="themeIcon">🌙</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- KPI Cards Row (Matching SM Info Reference) -->
+            <section class="kpi-grid">
+        <div class="kpi-card coral-grad">
+          <div>
+            <h3 id="kpi1Value">PKR 950,000</h3>
+            <p id="kpi1Label">Gross Revenue</p>
+          </div>
+          <div class="kpi-icon">💰</div>
+        </div>
+
+        <div class="kpi-card purple-grad" id="kpiCard2">
+          <div>
+            <h3 id="kpi2Value">PKR 580,000</h3>
+            <p id="kpi2Label">Total Expenses</p>
+          </div>
+          <div class="kpi-icon">📉</div>
+        </div>
+
+        <div class="kpi-card cyan-grad">
+          <div>
+            <h3 id="kpi3Value">PKR 370,000</h3>
+            <p id="kpi3Label">Net Profit</p>
+          </div>
+          <div class="kpi-icon">📈</div>
+        </div>
+
+        <div class="kpi-card coral-grad" id="kpiCard4">
+          <div>
+            <h3 id="kpi4Value">100 / 102</h3>
+            <p id="kpi4Label">Total Students & Staff</p>
+          </div>
+          <div class="kpi-icon">🎓</div>
+        </div>
+      </section>
+
+      <!-- Charts Row -->
+      <section class="charts-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Management Value</h3>
+            <div class="metric-pills">
+              <button class="m-pill active" data-metric="earning">Earning</button>
+              <button class="m-pill" data-metric="absent">Absent</button>
+              <button class="m-pill" data-metric="present">Present</button>
+            </div>
+          </div>
+          <canvas id="waveChart" height="120"></canvas>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Demographics & Status</h3>
+            <button id="exportCsvBtn" class="mini-btn">⬇ Export CSV</button>
+          </div>
+          <canvas id="donutChart" height="160"></canvas>
+        </div>
+      </section>
+
+      <!-- Bottom Row: Subject Tasks & Top Students / Records -->
+      <section class="bottom-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Subject Task Completion</h3>
+            <span class="badge-secure">🔒 Offline & Cloud Ready</span>
+          </div>
+          <div id="subjectBars" class="bars-container"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Top Students & Uploaded Vault</h3>
+            <button id="quickAddStudent" class="mini-btn">+ Add Record</button>
+          </div>
+          <input type="search" id="studentSearchInput" class="pill-select" style="width:100%; margin-bottom:12px;" placeholder="🔍 Search student by Name, Roll No, or ID..." />
+
+
+          <div id="studentList" class="student-list"></div>
+        </div>
+      </section>
+            <!-- Dedicated Student Directory & Record Lookup View -->
+      <section id="searchDirView" class="hidden">
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <h3>Search Enrolled Students (By Name or Unique Student ID)</h3>
+            <span class="badge-secure">Directory Lookup</span>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <input type="text" id="dirSearchInput" class="pill-select" style="flex:1; min-width:240px;" placeholder="Enter Student Name (e.g., Ayesha) or Unique ID (e.g., STU-2026-1005)..." />
+            <button id="dirSearchBtn" class="btn-primary" type="button">Search Student</button>
+            <button id="dirClearBtn" class="btn-secondary" type="button">Show All</button>
+          </div>
+        </div>
+
+        <div id="fullRecordCard" class="panel hidden" style="margin-bottom:20px; border:2px solid #2563eb;"></div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 id="dirResultsTitle">Matching Enrolled Students</h3>
+          </div>
+          <div id="dirResultsList" class="student-list" style="max-height:480px; overflow-y:auto;"></div>
+        </div>
+      </section>
+
+      <!-- Exams, Marks Entry & Student Report Card View -->
+      <section id="examsView" class="hidden">
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <h3>📝 Exam Marks Entry, Report Cards & Admit Cards</h3>
+            <span class="badge-secure">Owner / Admin / Teacher Authorized</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+            <label style="font-size:0.84rem; font-weight:600;">Select Student
+              <select id="examStudentSelect" class="pill-select" style="width:100%; margin-top:4px;"></select>
+            </label>
+            <label style="font-size:0.84rem; font-weight:600;">Exam Term
+              <select id="examTermSelect" class="pill-select" style="width:100%; margin-top:4px;">
+                <option value="Mid-Term Exam 2026">Mid-Term Exam 2026</option>
+                <option value="Final Annual Exam 2026">Final Annual Exam 2026</option>
+                <option value="Monthly Assessment">Monthly Assessment</option>
+              </select>
+            </label>
+            <label style="font-size:0.84rem; font-weight:600;">Subject
+              <input type="text" id="examSubjectInput" class="pill-select" style="width:100%; margin-top:4px;" placeholder="e.g., Mathematics" />
+            </label>
+            <label style="font-size:0.84rem; font-weight:600;">Marks Obtained (0–100)
+              <input type="number" id="examMarksInput" class="pill-select" style="width:100%; margin-top:4px;" min="0" max="100" placeholder="e.g., 88" />
+            </label>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+            <button id="saveExamMarkBtn" class="btn-primary" type="button">+ Save Subject Marks</button>
+            <button id="generateReportCardBtn" class="btn-secondary" type="button">🎓 View / Print Report Card</button>
+            <button id="generateExamCardBtn" class="btn-primary" type="button">🪪 Generate Exam Admit Card</button>
+          </div>
+        </div>
+        <div id="studentReportCardBox" class="panel hidden" style="border:2px solid #2563eb;"></div>
+      </section>
+
+      <section id="feesView" class="hidden">
+        <div class="panel" style="margin-bottom:20px;"></div>
+        <div id="feeReceiptBox" class="panel hidden" style="margin-bottom:20px; border:2px solid #10b981;"></div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 id="feeLedgerTitle">Student Fee Ledger</h3>
+          </div>
+          <div id="feeLedgerList" class="student-list" style="max-height:420px; overflow-y:auto;"></div>
+        </div>
+      </section>
+      <section id="permissionsView" class="hidden">
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <h3>👑 Owner Account & Feature Permission Manager</h3>
+            <span class="badge-secure">Owner Exclusive Access</span>
+          </div>
+          <div id="permissionsWorkspace"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- White-Label Branding Modal -->
+  <div id="brandModal" class="modal hidden">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>Customize School Branding</h3>
+        <button id="closeBrandX" class="mini-btn" type="button">✕</button>
+      </div>
+      <p class="subtitle">Rebrand this software for any client school (saves offline automatically).</p>
+      <label>School Name
+        <input type="text" id="inputSchoolName" placeholder="e.g., Beaconhouse Campus" />
+      </label>
+      <label>Tagline / Subtitle
+        <input type="text" id="inputSchoolTagline" placeholder="e.g., Smart Campus ERP" />
+      </label>
+      <label>Upload School Logo (PNG, JPG, SVG)
+        <input type="file" id="inputSchoolLogo" accept="image/*" />
+      </label>
+      <div class="modal-actions">
+        <button id="cancelBrandBtn" class="btn-secondary" type="button">Cancel</button>
+        <button id="resetBrandBtn" class="btn-secondary" type="button">Reset Default</button>
+        <button id="saveBrandBtn" class="btn-primary" type="button">Save Branding</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- File, Photo & CSV Upload Modal -->
+  <div id="uploadModal" class="modal hidden">
+    <div class="modal-card">
+      <h3>Upload Records, Photos & Spreadsheets</h3>
+      <label>Record Title / Student Name
+        <input type="text" id="recordNameInput" placeholder="e.g., Ayesha Khan - Grade 8" />
+      </label>
+      <label>Upload Student Photo or Document (PDF/JPG/PNG)
+        <input type="file" id="recordFileInput" accept="image/*,.pdf,.doc,.docx" />
+      </label>
+      <label>Or Import Bulk CSV Spreadsheet
+        <input type="file" id="csvFileInput" accept=".csv" />
+      </label>
+      <div class="modal-actions">
+        <button id="closeUploadBtn" class="btn-secondary">Cancel</button>
+        <button id="saveRecordBtn" class="btn-primary">Save to Vault</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Student Admission Modal -->
+  <div id="admissionModal" class="modal hidden">
+    <div class="modal-card">
+      <h3>New Student Admission</h3>
+      <label>Student Full Name
+        <input type="text" id="admName" placeholder="e.g., Hamza Ali" required />
+      </label>
+      <label>Class / Grade & Roll No
+        <input type="text" id="admGrade" placeholder="e.g., Grade 6 - Roll #104" />
+      </label>
+      <label>Parent Email (for alerts & receipts)
+        <input type="email" id="admEmail" placeholder="e.g., parent@email.com" />
+      </label>
+      <label>Academic Session
+        <select id="admPeriod" class="pill-select">
+          <option value="present">Present (2026–27)</option>
+          <option value="future">Future Admission (2027–28)</option>
+          <option value="past">Past Record (2025–26)</option>
+        </select>
+      </label>
+            <label>Gender
+        <select id="admGender">
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </label>
+      <label>Student Passport Photo (JPG/PNG)
+        <input type="file" id="admPhoto" accept="image/*" />
+      </label>
+      <label>Admission Document / B-Form (PDF/JPG)
+        <input type="file" id="admDoc" accept="image/*,.pdf,.doc,.docx" />
+      </label>
+      <div class="modal-actions">
+        <button id="closeAdmissionBtn" class="btn-secondary">Cancel</button>
+        <button id="saveAdmissionBtn" class="btn-primary">Admit Student</button>
+      </div>
+    </div>
+  </div>
+  <!-- Email Alert Composer Modal -->
+  <div id="emailModal" class="modal hidden">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>Send Email Alert</h3>
+        <button id="closeEmailX" class="mini-btn" type="button">✕</button>
+      </div>
+      <label>Recipient Group / Parent Email
+        <input type="text" id="emailToInput" placeholder="e.g., all-parents@school.edu" />
+      </label>
+      <label>Subject
+        <input type="text" id="emailSubjInput" value="Academic & Fee Reminder" />
+      </label>
+      <label>Message
+        <input type="text" id="emailBodyInput" value="Dear Parent, please review the latest student progress and fee update." />
+      </label>
+      <div class="modal-actions">
+        <button id="cancelEmailBtn" class="btn-secondary" type="button">Cancel</button>
+        <button id="confirmSendEmailBtn" class="btn-primary" type="button">Send Alert</button>
+      </div>
+    </div>
+  </div>
+  <!-- Role Login Modal (Owner, Admin, Specific Teacher) -->
+  <div id="loginModal" class="modal">
+    <div class="modal-card">
+      <h3>🔐 Staff & Owner Login</h3>
+      <p class="subtitle">Please enter your authorized school credentials to continue.</p>
+      <label>Username
+        <input type="text" id="loginUserInput" placeholder="e.g., owner, admin, or teacher1" />
+      </label>
+      <label>Password
+        <input type="password" id="loginPassInput" placeholder="Enter password" />
+      </label>
+      <div class="modal-actions">
+        <button id="submitLoginBtn" class="btn-primary" type="button" style="width:100%;">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Owner & Admin Master Editor Modal -->
+  <div id="masterEditModal" class="modal hidden">
+    <div class="modal-card" style="max-width:480px; max-height:88vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="masterEditTitle">Edit Record</h3>
+        <button id="closeMasterEditX" class="mini-btn" type="button">✕</button>
+      </div>
+      <div id="masterEditFields" style="display:flex; flex-direction:column; gap:10px;"></div>
+      <div class="modal-actions">
+        <button id="cancelMasterEditBtn" class="btn-secondary" type="button">Cancel</button>
+        <button id="saveMasterEditBtn" class="btn-primary" type="button">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+
+</body>
+</html>
